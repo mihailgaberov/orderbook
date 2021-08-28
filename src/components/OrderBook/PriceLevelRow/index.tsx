@@ -20,14 +20,14 @@ const PriceLevelRow: FunctionComponent<PriceLevelRowProps> = ({
     <Container isRight={!reversedFieldsOrder} depth={depth}>
       {reversedFieldsOrder ?
         <>
-          <span>{price}</span>
+          <span className='price'>{price}</span>
           <span>{size}</span>
           <span>{total}</span>
         </> :
         <>
           <span>{total}</span>
           <span>{size}</span>
-          <span>{price}</span>
+          <span className='price'>{price}</span>
         </>}
     </Container>
   );

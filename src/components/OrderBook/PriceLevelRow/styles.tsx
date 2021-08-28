@@ -29,4 +29,8 @@ export const Container = styled.div<ContainerProps>`
   span {
     z-index: 1;
   }
+  
+  .price {
+    color: ${props => props.isRight ? '#118860' : '#bb3336'}
+  }
 `
