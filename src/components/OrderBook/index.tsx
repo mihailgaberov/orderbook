@@ -60,7 +60,7 @@ const OrderBook = () => {
     return arg.toLocaleString("en", {useGrouping: true, minimumFractionDigits: 2})
   };
 
-  const buildPriceLevels = (levels: []): React.ReactNode => {
+  const buildPriceLevels = (levels: [], reversedOrder: boolean = false): React.ReactNode => {
     const totalSums: number[] = [];
 
     return (
@@ -70,7 +70,7 @@ const OrderBook = () => {
         const total: string = formatNumber(calculatedTotal);
         const size: string = formatNumber(level[1]);
         const price: string = formatPrice(level[0]);
-        return <PriceLevelRow key={idx} total={total} size={size} price={price} />;
+        return <PriceLevelRow key={idx} total={total} size={size} price={price} reversedFieldsOrder={reversedOrder} />;
       })
     );
   };
@@ -82,8 +82,8 @@ const OrderBook = () => {
         {existingState && buildPriceLevels(existingState.bids)}
       </TableContainer>
       <TableContainer>
-        <TitleRow />
-        {existingState && buildPriceLevels(existingState.asks)}
+        <TitleRow reversedFieldsOrder={true} />
+        {existingState && buildPriceLevels(existingState.asks, true)}
       </TableContainer>
     </Container>
   )
