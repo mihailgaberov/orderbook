@@ -61,12 +61,16 @@ const OrderBook = () => {
   };
 
   const buildPriceLevels = (levels: []): React.ReactNode => {
+    const totalSums: number[] = [];
+
     return (
-      levels.map((level, index) => {
-        const total: string = formatNumber(level[1]);
+      levels.map((level, idx) => {
+        const calculatedTotal: number = idx === 0 ? level[1] : level[1] + totalSums[idx - 1];
+        totalSums.push(calculatedTotal);
+        const total: string = formatNumber(calculatedTotal);
         const size: string = formatNumber(level[1]);
         const price: string = formatPrice(level[0]);
-        return <PriceLevelRow key={index} total={total} size={size} price={price} />;
+        return <PriceLevelRow key={idx} total={total} size={size} price={price} />;
       })
     );
   };
