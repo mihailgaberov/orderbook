@@ -1,21 +1,19 @@
 import React, { FunctionComponent } from 'react';
 import { Container } from "./styles";
 
-interface PriceLevelRow {
+interface PriceLevelRowProps {
   total: string;
   size: string;
   price: string;
 }
 
-const PriceLevelRow: FunctionComponent<PriceLevelRow> = ({total, size, price}) => {
+const PriceLevelRow: FunctionComponent<PriceLevelRowProps> = ({total, size, price}) => {
   return (
-    <div>
-      <Container>
-        <span>{total}</span>
-        <span>{size}</span>
-        <span>{price}</span>
-      </Container>
-    </div>
+    <Container>
+      <span>{total}</span>
+      <span>{size}</span>
+      <span>{price}</span>
+    </Container>
   );
 };
 
