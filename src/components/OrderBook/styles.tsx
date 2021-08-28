@@ -5,7 +5,6 @@ export const Container = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: #1c2a31;
   border-color: #263946;
   
   @media only screen and (min-width: 800px) {

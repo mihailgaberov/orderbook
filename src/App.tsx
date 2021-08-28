@@ -2,6 +2,7 @@ import React from 'react';
 import GlobalStyle from "./styles/global"
 import Header from "./components/Header";
 import OrderBook from "./components/OrderBook";
+import Footer from "./components/Footer";
 
 function App() {
   return (
@@ -9,6 +10,7 @@ function App() {
       <GlobalStyle/>
       <Header/>
       <OrderBook/>
+      <Footer />
     </>
   );
 }

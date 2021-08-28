@@ -43,5 +43,8 @@
   "devDependencies": {
     "@types/styled-components": "^5.1.13",
     "babel-plugin-styled-components": "^1.13.2"
+  },
+  "resolutions": {
+    "styled-components": "^5"
   }
 }
