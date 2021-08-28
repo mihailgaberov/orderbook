@@ -8,6 +8,6 @@ export const Container = styled.div`
   background-color: #1c2a31;
   
   span {
-    min-width: 15%;
+    min-width: 5rem;
   }
 `
