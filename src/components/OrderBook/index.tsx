@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useReducer } from 'react';
 
 import TitleRow from "./TitleRow";
 import { Container, TableContainer } from "./styles";
 import PriceLevelRow from "./PriceLevelRow";
 import Spread from "../Spread";
+import OrderBookReducer, { initialState, OrderBookActions } from "./OrderBookReducer";
 
 const WSS_FEED_URL: string = 'wss://www.cryptofacilities.com/ws/v1';
 const subscribeMessage = {
@@ -12,24 +13,25 @@ const subscribeMessage = {
   product_ids: ['PI_XBTUSD']
 };
 
-interface Delta {
+export interface Delta {
   feed: string;
   product_id: string;
   bids: [];
   asks: [];
 }
-
+/*
 interface ExistingState {
   numLevels: number;
   feed: string;
   bids: [];
   asks: [];
   product_id: string;
-}
+}*/
 
 const OrderBook = () => {
-  const [delta, setDelta] = useState<Delta>();
-  const [existingState, setExistingState] = useState<ExistingState>();
+  // const [delta, setDelta] = useState<Delta>();
+  // const [existingState, setExistingState] = useState<ExistingState>();
+  const [state, dispatch] = useReducer(OrderBookReducer, initialState);
 
   useEffect(() => {
     const ws = new WebSocket(WSS_FEED_URL);
@@ -40,9 +42,15 @@ const OrderBook = () => {
     ws.onmessage = (event) => {
       const response = JSON.parse(event.data);
       if (response.numLevels) {
-        setExistingState(response);
+        dispatch({type: OrderBookActions.EXISTING_STATE, data: response});
       } else {
-        // setDelta(response);
+        if (response?.bids?.length > 0) {
+          dispatch({type: OrderBookActions.BIDS, data: response.bids});
+        }
+
+        if (response?.asks?.length > 0) {
+          dispatch({type: OrderBookActions.ASKS, data: response.asks});
+        }
       }
     };
     ws.onclose = () => {
@@ -65,7 +73,7 @@ const OrderBook = () => {
   const buildPriceLevels = (levels: [], reversedOrder: boolean = false): React.ReactNode => {
     const totalSums: number[] = [];
 
-    // Prepare data, i.e. add totals and depth
+    // Add total amounts
     levels.map((level: any, idx) => {
       level[2] = idx === 0 ? level[1] : level[1] + totalSums[idx - 1];
       totalSums.push(level[2]);
@@ -94,19 +102,21 @@ const OrderBook = () => {
 
   return (
     <Container>
-      {existingState ?
+      {state ?
         <>
           <TableContainer>
             <TitleRow />
-            {buildPriceLevels(existingState.bids)}
+            {buildPriceLevels(state.bids)}
           </TableContainer>
           <Spread />
           <TableContainer>
             <TitleRow reversedFieldsOrder={true} />
-            {buildPriceLevels(existingState.asks, true)}
+            {buildPriceLevels(state.asks, true)}
           </TableContainer>
         </> :
         <>No data.</>}
+
+
     </Container>
   )
 };
