@@ -13,4 +13,7 @@ export default createGlobalStyle`
     margin: 0 auto;
   }
 
+  body {
+    background-color: #1c2a31;
+  }
 `

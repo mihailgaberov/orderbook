@@ -8,7 +8,7 @@ export const Container = styled.div`
   background-color: #1c2a31;
   border-color: #263946;
   
-  @media only screen and (min-width: 600px) {
+  @media only screen and (min-width: 800px) {
     flex-direction: row;
     justify-content: center;
   }
