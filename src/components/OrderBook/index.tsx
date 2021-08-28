@@ -42,7 +42,7 @@ const OrderBook = () => {
       if (response.numLevels) {
         setExistingState(response);
       } else {
-        setDelta(response);
+        // setDelta(response);
       }
     };
     ws.onclose = () => {
@@ -65,29 +65,48 @@ const OrderBook = () => {
   const buildPriceLevels = (levels: [], reversedOrder: boolean = false): React.ReactNode => {
     const totalSums: number[] = [];
 
+    // Prepare data, i.e. add totals and depth
+    levels.map((level: any, idx) => {
+      level[2] = idx === 0 ? level[1] : level[1] + totalSums[idx - 1];
+      totalSums.push(level[2]);
+      return level;
+    });
+
+    const maxTotal: number = Math.max.apply(Math, totalSums);
+
     return (
       levels.map((level, idx) => {
-        const calculatedTotal: number = idx === 0 ? level[1] : level[1] + totalSums[idx - 1];
-        totalSums.push(calculatedTotal);
+        const calculatedTotal: number = level[2];
+        const depth = (calculatedTotal * 100) / maxTotal;
         const total: string = formatNumber(calculatedTotal);
         const size: string = formatNumber(level[1]);
         const price: string = formatPrice(level[0]);
-        return <PriceLevelRow key={idx} total={total} size={size} price={price} reversedFieldsOrder={reversedOrder} />;
+
+        return <PriceLevelRow key={idx}
+                              total={total}
+                              depth={depth}
+                              size={size}
+                              price={price}
+                              reversedFieldsOrder={reversedOrder}/>;
       })
     );
   };
 
   return (
     <Container>
-      <TableContainer>
-        <TitleRow />
-        {existingState && buildPriceLevels(existingState.bids)}
-      </TableContainer>
-      <Spread />
-      <TableContainer>
-        <TitleRow reversedFieldsOrder={true} />
-        {existingState && buildPriceLevels(existingState.asks, true)}
-      </TableContainer>
+      {existingState ?
+        <>
+          <TableContainer>
+            <TitleRow />
+            {buildPriceLevels(existingState.bids)}
+          </TableContainer>
+          <Spread />
+          <TableContainer>
+            <TitleRow reversedFieldsOrder={true} />
+            {buildPriceLevels(existingState.asks, true)}
+          </TableContainer>
+        </> :
+        <>No data.</>}
     </Container>
   )
 };
