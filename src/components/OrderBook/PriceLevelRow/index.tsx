@@ -14,7 +14,7 @@ const PriceLevelRow: FunctionComponent<PriceLevelRowProps> = ({
                                                                 price,
                                                                 reversedFieldsOrder = false }) => {
   return (
-    <Container>
+    <Container isRight={!reversedFieldsOrder} depth={29}>
       {reversedFieldsOrder ?
         <>
           <span>{price}</span>
