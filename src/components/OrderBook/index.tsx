@@ -19,18 +19,8 @@ export interface Delta {
   bids: [];
   asks: [];
 }
-/*
-interface ExistingState {
-  numLevels: number;
-  feed: string;
-  bids: [];
-  asks: [];
-  product_id: string;
-}*/
 
 const OrderBook = () => {
-  // const [delta, setDelta] = useState<Delta>();
-  // const [existingState, setExistingState] = useState<ExistingState>();
   const [state, dispatch] = useReducer(OrderBookReducer, initialState);
 
   useEffect(() => {
@@ -42,6 +32,7 @@ const OrderBook = () => {
     ws.onmessage = (event) => {
       const response = JSON.parse(event.data);
       if (response.numLevels) {
+        console.log("resp:", response.bids);
         dispatch({type: OrderBookActions.EXISTING_STATE, data: response});
       } else {
         if (response?.bids?.length > 0) {
@@ -70,12 +61,20 @@ const OrderBook = () => {
     return arg.toLocaleString("en", {useGrouping: true, minimumFractionDigits: 2})
   };
 
+  /*const memoizedCallback = useCallback(
+    (levels, isReversedOrder) => {
+        buildPriceLevels(levels, isReversedOrder);
+      },
+    [],
+  );*/
+
   const buildPriceLevels = (levels: [], reversedOrder: boolean = false): React.ReactNode => {
     const totalSums: number[] = [];
 
     // Add total amounts
     levels.map((level: any, idx) => {
-      level[2] = idx === 0 ? level[1] : level[1] + totalSums[idx - 1];
+      const size: number = level[1];
+      level[2] = idx === 0 ? size : size + totalSums[idx - 1];
       totalSums.push(level[2]);
       return level;
     });
@@ -121,4 +120,4 @@ const OrderBook = () => {
   )
 };
 
-export default OrderBook;
+export default React.memo(OrderBook);
