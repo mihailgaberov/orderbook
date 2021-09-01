@@ -1,10 +1,11 @@
-import React, { useEffect, useReducer } from 'react';
+import React, { useEffect } from 'react';
 
 import TitleRow from "./TitleRow";
 import { Container, TableContainer } from "./styles";
 import PriceLevelRow from "./PriceLevelRow";
 import Spread from "../Spread";
-import OrderBookReducer, { initialState, OrderBookActions } from "./OrderBookReducer";
+import { useAppDispatch, useAppSelector } from '../../hooks';
+import { addAsks, addBids, addExistingState, selectAsks, selectBids } from './orderbookSlice';
 
 const WSS_FEED_URL: string = 'wss://www.cryptofacilities.com/ws/v1';
 const subscribeMessage = {
@@ -21,7 +22,9 @@ export interface Delta {
 }
 
 const OrderBook = () => {
-  const [state, dispatch] = useReducer(OrderBookReducer, initialState);
+  const bids = useAppSelector(selectBids);
+  const asks = useAppSelector(selectAsks);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     const ws = new WebSocket(WSS_FEED_URL);
@@ -32,15 +35,13 @@ const OrderBook = () => {
     ws.onmessage = (event) => {
       const response = JSON.parse(event.data);
       if (response.numLevels) {
-        console.log("resp:", response.bids);
-        dispatch({type: OrderBookActions.EXISTING_STATE, data: response});
+        dispatch(addExistingState(response));
       } else {
         if (response?.bids?.length > 0) {
-          dispatch({type: OrderBookActions.BIDS, data: response.bids});
+          dispatch(addBids(response.bids));
         }
-
         if (response?.asks?.length > 0) {
-          dispatch({type: OrderBookActions.ASKS, data: response.asks});
+          dispatch(addAsks(response.asks));
         }
       }
     };
@@ -51,7 +52,7 @@ const OrderBook = () => {
     return () => {
       ws.close();
     };
-  }, []);
+  }, [dispatch]);
 
   const formatNumber = (arg: number): string => {
     return new Intl.NumberFormat('en-US').format(arg);
@@ -61,23 +62,19 @@ const OrderBook = () => {
     return arg.toLocaleString("en", {useGrouping: true, minimumFractionDigits: 2})
   };
 
-  /*const memoizedCallback = useCallback(
-    (levels, isReversedOrder) => {
-        buildPriceLevels(levels, isReversedOrder);
-      },
-    [],
-  );*/
-
-  const buildPriceLevels = (levels: [], reversedOrder: boolean = false): React.ReactNode => {
+  const buildPriceLevels = (levels: number[][], reversedOrder: boolean = false): React.ReactNode => {
     const totalSums: number[] = [];
 
+    // TODO: move out the calculation of the totals
     // Add total amounts
-    levels.map((level: any, idx) => {
+   /* const levelsWithTotals: number[][] = levels.map((level: number[], idx) => {
       const size: number = level[1];
-      level[2] = idx === 0 ? size : size + totalSums[idx - 1];
-      totalSums.push(level[2]);
-      return level;
-    });
+      const updatedLevel = [...level];
+      const totalSum: number = idx === 0 ? size : size + totalSums[idx - 1];
+      updatedLevel[2] = totalSum;
+      totalSums.push(totalSum);
+      return updatedLevel;
+    });*/
 
     const maxTotal: number = Math.max.apply(Math, totalSums);
 
@@ -101,16 +98,16 @@ const OrderBook = () => {
 
   return (
     <Container>
-      {state ?
+      {bids && asks ?
         <>
           <TableContainer>
             <TitleRow />
-            {buildPriceLevels(state.bids)}
+            {buildPriceLevels(bids)}
           </TableContainer>
           <Spread />
           <TableContainer>
             <TitleRow reversedFieldsOrder={true} />
-            {buildPriceLevels(state.asks, true)}
+            {buildPriceLevels(asks, true)}
           </TableContainer>
         </> :
         <>No data.</>}
