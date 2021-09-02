@@ -11,7 +11,9 @@ interface Delta {
 export interface OrderbookState {
   market: string;
   bids: number[][];
+  maxTotalBids: number;
   asks: number[][];
+  maxTotalAsks: number;
   delta: Delta
 }
 
@@ -20,27 +22,31 @@ const ORDERBOOK_LEVELS: number = 25;
 const initialState: OrderbookState = {
   market: 'PI_XBTUSD', // PI_ETHUSD
   bids: [],
+  maxTotalBids: 0,
   asks: [],
+  maxTotalAsks: 0,
   delta: { feed: '', product_id: '', bids: [], asks: [] }
 };
 
+const sortByPrice = (currentLevel: number[], nextLevel: number[]): number => nextLevel[0] - currentLevel[0];
+
 const removePriceLevel = (price: number, levels: number[][]): number[][] => levels.filter(level => level[0] !== price);
 
-const updatePriceLevel = (updatedLevel: number[], levels: number[][]): [] => {
+const updatePriceLevel = (updatedLevel: number[], levels: number[][]): number[][] => {
   return levels.map(level => {
     if (level[0] === updatedLevel[0]) {
       level = updatedLevel;
     }
     return level;
-  }) as [];
+  });
 };
-
 
 const levelExists = (deltaLevelPrice: number, currentLevels: number[][]): boolean => currentLevels.some(level => level[0] === deltaLevelPrice);
 
-const addPriceLevel = (deltaLevel: [], levels: number[][]): number[][] => {
-  return [...levels, deltaLevel];
+const addPriceLevel = (deltaLevel: number[], levels: number[][]): number[][] => {
+  return [ ...levels, deltaLevel ];
 };
+
 /**
  *  If the size returned by a delta is 0 then
  that price level should be removed from the orderbook,
@@ -52,7 +58,7 @@ const addPriceLevel = (deltaLevel: [], levels: number[][]): number[][] => {
  * @param currentLevels Existing price levels - `bids` or `asks`
  * @param orders Update of a price level
  */
-const applyDeltas = (currentLevels: number[][], orders: []): number[][] => {
+const applyDeltas = (currentLevels: number[][], orders: number[][]): number[][] => {
   let updatedLevels: number[][] = currentLevels;
 
   orders.forEach((deltaLevel) => {
@@ -61,10 +67,10 @@ const applyDeltas = (currentLevels: number[][], orders: []): number[][] => {
 
     // If new size is zero - delete the price level
     if (deltaLevelSize === 0) {
-       updatedLevels = removePriceLevel(deltaLevelPrice, updatedLevels);
+      updatedLevels = removePriceLevel(deltaLevelPrice, updatedLevels);
     } else {
       // If the price level exists and the size is not zero, update it
-      if (levelExists(deltaLevelPrice, currentLevels)){
+      if (levelExists(deltaLevelPrice, currentLevels)) {
         updatedLevels = updatePriceLevel(deltaLevel, updatedLevels);
       } else {
         // If the price level doesn't exist in the orderbook and there are less than 25 levels, add it
@@ -78,29 +84,58 @@ const applyDeltas = (currentLevels: number[][], orders: []): number[][] => {
   return updatedLevels;
 }
 
+const addTotalSums = (orders: number[][]): { levelsWithTotals: number[][], maxTotal: number } => {
+  const totalSums: number[] = [];
+
+  const levelsWithTotals: number[][] = orders.map((level: number[], idx) => {
+    const size: number = level[1];
+    const updatedLevel = [ ...level ];
+    const totalSum: number = idx === 0 ? size : size + totalSums[idx - 1];
+    updatedLevel[2] = totalSum;
+    totalSums.push(totalSum);
+    return updatedLevel;
+  });
+
+  const maxTotal: number = Math.max.apply(Math, totalSums);
+  return {
+    levelsWithTotals,
+    maxTotal
+  };
+};
+
 export const orderbookSlice = createSlice({
   name: 'orderbook',
   initialState,
   reducers: {
     addBids: (state, { payload }) => {
-      state.delta.bids = payload;
-      state.bids = applyDeltas(current(state).bids, payload);
+      const { levelsWithTotals: deltaBidsWithTotals } = addTotalSums(payload);
+      state.delta.bids = deltaBidsWithTotals;
+      state.bids = applyDeltas(current(state).bids, deltaBidsWithTotals);
     },
     addAsks: (state, { payload }) => {
-      state.delta.asks = payload;
-      state.asks = applyDeltas(current(state).asks, payload);
+      const { levelsWithTotals: deltaAsksWithTotals } = addTotalSums(payload);
+      state.delta.asks = deltaAsksWithTotals;
+      state.asks = applyDeltas(current(state).asks, deltaAsksWithTotals);
     },
     addExistingState: (state, action: PayloadAction<any>) => {
       state.market = action.payload['product_id'];
-      state.bids = action.payload.bids;
-      state.asks = action.payload.asks;
+
+      const { levelsWithTotals: bidsWithTotals, maxTotal: maxTotalBids } = addTotalSums(action.payload.bids);
+      state.bids = bidsWithTotals;
+      state.maxTotalBids = maxTotalBids;
+
+      const { levelsWithTotals: asksWithTotals, maxTotal: maxTotalAsks } = addTotalSums(action.payload.asks);
+      state.asks = asksWithTotals;
+      state.maxTotalAsks = maxTotalAsks;
     },
   }
 });
 
 export const { addBids, addAsks, addExistingState } = orderbookSlice.actions;
 
-export const selectBids = (state: RootState) => state.orderbook.bids;
-export const selectAsks = (state: RootState) => state.orderbook.asks;
+export const selectBids = (state: RootState): number[][] => state.orderbook.bids;
+export const selectAsks = (state: RootState): number[][] => state.orderbook.asks;
+export const selectMaxTotalBids = (state: RootState): number => state.orderbook.maxTotalBids
+export const selectMaxTotalAsks = (state: RootState): number => state.orderbook.maxTotalBids
 
 export default orderbookSlice.reducer;

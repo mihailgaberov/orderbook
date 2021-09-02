@@ -5,14 +5,27 @@ import { Container, TableContainer } from "./styles";
 import PriceLevelRow from "./PriceLevelRow";
 import Spread from "../Spread";
 import { useAppDispatch, useAppSelector } from '../../hooks';
-import { addAsks, addBids, addExistingState, selectAsks, selectBids } from './orderbookSlice';
+import {
+  addAsks,
+  addBids,
+  addExistingState,
+  selectAsks,
+  selectBids,
+  selectMaxTotalBids,
+  selectMaxTotalAsks
+} from './orderbookSlice';
 
 const WSS_FEED_URL: string = 'wss://www.cryptofacilities.com/ws/v1';
 const subscribeMessage = {
   event: 'subscribe',
   feed: 'book_ui_1',
-  product_ids: ['PI_XBTUSD']
+  product_ids: [ 'PI_XBTUSD' ]
 };
+
+enum OrderType {
+  BIDS,
+  ASKS
+}
 
 export interface Delta {
   feed: string;
@@ -22,8 +35,10 @@ export interface Delta {
 }
 
 const OrderBook = () => {
-  const bids = useAppSelector(selectBids);
-  const asks = useAppSelector(selectAsks);
+  const bids: number[][] = useAppSelector(selectBids);
+  const asks: number[][] = useAppSelector(selectAsks);
+  const maxTotalBids: number = useAppSelector(selectMaxTotalBids);
+  const maxTotalAsks: number = useAppSelector(selectMaxTotalAsks);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -52,31 +67,18 @@ const OrderBook = () => {
     return () => {
       ws.close();
     };
-  }, [dispatch]);
+  }, [ dispatch ]);
 
   const formatNumber = (arg: number): string => {
     return new Intl.NumberFormat('en-US').format(arg);
   };
 
   const formatPrice = (arg: number): string => {
-    return arg.toLocaleString("en", {useGrouping: true, minimumFractionDigits: 2})
+    return arg.toLocaleString("en", { useGrouping: true, minimumFractionDigits: 2 })
   };
 
-  const buildPriceLevels = (levels: number[][], reversedOrder: boolean = false): React.ReactNode => {
-    const totalSums: number[] = [];
-
-    // TODO: move out the calculation of the totals
-    // Add total amounts
-   /* const levelsWithTotals: number[][] = levels.map((level: number[], idx) => {
-      const size: number = level[1];
-      const updatedLevel = [...level];
-      const totalSum: number = idx === 0 ? size : size + totalSums[idx - 1];
-      updatedLevel[2] = totalSum;
-      totalSums.push(totalSum);
-      return updatedLevel;
-    });*/
-
-    const maxTotal: number = Math.max.apply(Math, totalSums);
+  const buildPriceLevels = (levels: number[][], orderType: OrderType = OrderType.BIDS): React.ReactNode => {
+    const maxTotal: number = orderType === OrderType.BIDS ? maxTotalBids : maxTotalAsks;
 
     return (
       levels.map((level, idx) => {
@@ -91,7 +93,7 @@ const OrderBook = () => {
                               depth={depth}
                               size={size}
                               price={price}
-                              reversedFieldsOrder={reversedOrder}/>;
+                              reversedFieldsOrder={orderType === OrderType.ASKS} />;
       })
     );
   };
@@ -102,12 +104,12 @@ const OrderBook = () => {
         <>
           <TableContainer>
             <TitleRow />
-            {buildPriceLevels(bids)}
+            {buildPriceLevels(bids, OrderType.BIDS)}
           </TableContainer>
           <Spread />
           <TableContainer>
             <TitleRow reversedFieldsOrder={true} />
-            {buildPriceLevels(asks, true)}
+            {buildPriceLevels(asks, OrderType.ASKS)}
           </TableContainer>
         </> :
         <>No data.</>}
