@@ -76,13 +76,17 @@ const applyDeltas = (currentLevels: number[][], orders: number[][]): number[][] 
 const addTotalSums = (orders: number[][]): number[][] => {
   const totalSums: number[] = [];
 
-  return orders.map((level: number[], idx) => {
-    const size: number = level[1];
-    const updatedLevel = [...level];
-    const totalSum: number = idx === 0 ? size : size + totalSums[idx - 1];
-    updatedLevel[2] = totalSum;
-    totalSums.push(totalSum);
-    return updatedLevel;
+  return orders.map((order: number[], idx) => {
+    const size: number = order[1];
+    if (typeof order[2] !== 'undefined') {
+      return order;
+    } else {
+      const updatedLevel = [...order];
+      const totalSum: number = idx === 0 ? size : size + totalSums[idx - 1]; // this
+      updatedLevel[2] = totalSum;
+      totalSums.push(totalSum);
+      return updatedLevel;
+    }
   });
 };
 
@@ -110,12 +114,12 @@ export const orderbookSlice = createSlice({
   initialState,
   reducers: {
     addBids: (state, { payload }) => {
-      const updatedBids: number[][] = applyDeltas(current(state).bids, addTotalSums(payload));
+      const updatedBids: number[][] = addTotalSums(applyDeltas(current(state).bids, payload));
       state.maxTotalBids = getMaxTotalSum(updatedBids);
       state.bids = addDepths(updatedBids, current(state).maxTotalBids);
     },
     addAsks: (state, { payload }) => {
-      const updatedAsks: number[][] = applyDeltas(current(state).asks, addTotalSums(payload));
+      const updatedAsks: number[][] = addTotalSums(applyDeltas(current(state).asks, payload));
       state.maxTotalAsks = getMaxTotalSum(updatedAsks);
       state.asks = addDepths(updatedAsks, current(state).maxTotalAsks);
     },
