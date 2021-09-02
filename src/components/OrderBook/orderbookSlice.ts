@@ -1,20 +1,12 @@
 import { createSlice, current, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../../store';
 
-interface Delta {
-  feed: string;
-  product_id: string;
-  bids: number[][];
-  asks: number[][];
-}
-
 export interface OrderbookState {
   market: string;
   bids: number[][];
   maxTotalBids: number;
   asks: number[][];
   maxTotalAsks: number;
-  delta: Delta
 }
 
 const ORDERBOOK_LEVELS: number = 25;
@@ -25,10 +17,7 @@ const initialState: OrderbookState = {
   maxTotalBids: 0,
   asks: [],
   maxTotalAsks: 0,
-  delta: { feed: '', product_id: '', bids: [], asks: [] }
 };
-
-const sortByPrice = (currentLevel: number[], nextLevel: number[]): number => nextLevel[0] - currentLevel[0];
 
 const removePriceLevel = (price: number, levels: number[][]): number[][] => levels.filter(level => level[0] !== price);
 
@@ -44,7 +33,7 @@ const updatePriceLevel = (updatedLevel: number[], levels: number[][]): number[][
 const levelExists = (deltaLevelPrice: number, currentLevels: number[][]): boolean => currentLevels.some(level => level[0] === deltaLevelPrice);
 
 const addPriceLevel = (deltaLevel: number[], levels: number[][]): number[][] => {
-  return [ ...levels, deltaLevel ];
+  return [...levels, deltaLevel];
 };
 
 /**
@@ -84,49 +73,69 @@ const applyDeltas = (currentLevels: number[][], orders: number[][]): number[][] 
   return updatedLevels;
 }
 
-const addTotalSums = (orders: number[][]): { levelsWithTotals: number[][], maxTotal: number } => {
+const addTotalSums = (orders: number[][]): number[][] => {
   const totalSums: number[] = [];
 
-  const levelsWithTotals: number[][] = orders.map((level: number[], idx) => {
+  return orders.map((level: number[], idx) => {
     const size: number = level[1];
-    const updatedLevel = [ ...level ];
+    const updatedLevel = [...level];
     const totalSum: number = idx === 0 ? size : size + totalSums[idx - 1];
     updatedLevel[2] = totalSum;
     totalSums.push(totalSum);
     return updatedLevel;
   });
-
-  const maxTotal: number = Math.max.apply(Math, totalSums);
-  return {
-    levelsWithTotals,
-    maxTotal
-  };
 };
+
+const addDepths = (orders: number[][], maxTotal: number): number[][] => {
+  return orders.map(order => {
+    if (typeof order[3] !== 'undefined') {
+      return order;
+    } else {
+      const calculatedTotal: number = order[2];
+      const depth = (calculatedTotal / maxTotal) * 100;
+      const updatedOrder = [...order];
+      updatedOrder[3] = depth;
+      return updatedOrder;
+    }
+  });
+};
+
+const getMaxTotalSum = (orders: number[][]): number => {
+  const totalSums: number[] = orders.map(order => order[2]);
+  return Math.max.apply(Math, totalSums);
+}
 
 export const orderbookSlice = createSlice({
   name: 'orderbook',
   initialState,
   reducers: {
     addBids: (state, { payload }) => {
-      const { levelsWithTotals: deltaBidsWithTotals } = addTotalSums(payload);
-      state.delta.bids = deltaBidsWithTotals;
-      state.bids = applyDeltas(current(state).bids, deltaBidsWithTotals);
+      // state.bids = applyDeltas(current(state).bids,  addTotalSums(payload));
+      const updatedBids: number[][] = applyDeltas(current(state).bids, addTotalSums(payload));
+      state.maxTotalBids = getMaxTotalSum(updatedBids);
+      state.bids = addDepths(updatedBids, current(state).maxTotalBids);
     },
     addAsks: (state, { payload }) => {
-      const { levelsWithTotals: deltaAsksWithTotals } = addTotalSums(payload);
-      state.delta.asks = deltaAsksWithTotals;
-      state.asks = applyDeltas(current(state).asks, deltaAsksWithTotals);
+      const updatedAsks: number[][] = applyDeltas(current(state).asks, addTotalSums(payload));
+      state.maxTotalAsks = getMaxTotalSum(updatedAsks);
+      state.asks = addDepths(updatedAsks, getMaxTotalSum(updatedAsks));
+
+      /*const maxTotal: number = payload[payload.length - 1][2];
+      console.log(maxTotal)
+      const updatedAsks: number[][] = addDepths(payload, maxTotal);
+      state.maxTotalAsks = maxTotal;
+      state.asks = applyDeltas(current(state).asks, updatedAsks);*/
     },
     addExistingState: (state, action: PayloadAction<any>) => {
       state.market = action.payload['product_id'];
 
-      const { levelsWithTotals: bidsWithTotals, maxTotal: maxTotalBids } = addTotalSums(action.payload.bids);
-      state.bids = bidsWithTotals;
-      state.maxTotalBids = maxTotalBids;
+      const bids: number[][] = addTotalSums(action.payload.bids);
+      state.maxTotalBids = getMaxTotalSum(bids);
+      state.bids = addDepths(bids, current(state).maxTotalBids);
 
-      const { levelsWithTotals: asksWithTotals, maxTotal: maxTotalAsks } = addTotalSums(action.payload.asks);
-      state.asks = asksWithTotals;
-      state.maxTotalAsks = maxTotalAsks;
+      const asks: number[][] = addTotalSums(action.payload.asks);
+      state.maxTotalAsks = getMaxTotalSum(asks);
+      state.asks = addDepths(asks, current(state).maxTotalAsks);
     },
   }
 });
@@ -135,7 +144,5 @@ export const { addBids, addAsks, addExistingState } = orderbookSlice.actions;
 
 export const selectBids = (state: RootState): number[][] => state.orderbook.bids;
 export const selectAsks = (state: RootState): number[][] => state.orderbook.asks;
-export const selectMaxTotalBids = (state: RootState): number => state.orderbook.maxTotalBids
-export const selectMaxTotalAsks = (state: RootState): number => state.orderbook.maxTotalBids
 
 export default orderbookSlice.reducer;

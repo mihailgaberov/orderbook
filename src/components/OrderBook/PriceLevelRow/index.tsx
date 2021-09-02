@@ -1,5 +1,6 @@
 import React, { FunctionComponent } from 'react';
 import { Container } from "./styles";
+import { MOBILE_WIDTH } from "../../../constants";
 
 interface PriceLevelRowProps {
   total: string;
@@ -7,6 +8,7 @@ interface PriceLevelRowProps {
   price: string;
   reversedFieldsOrder?: boolean;
   depth: number;
+  windowWidth: number;
 }
 
 const PriceLevelRow: FunctionComponent<PriceLevelRowProps> = ({
@@ -14,11 +16,12 @@ const PriceLevelRow: FunctionComponent<PriceLevelRowProps> = ({
                                                                 size,
                                                                 price,
                                                                 reversedFieldsOrder = false,
-                                                                depth
+                                                                depth,
+                                                                windowWidth
                                                               }) => {
   return (
-    <Container isRight={!reversedFieldsOrder} depth={depth}>
-      {reversedFieldsOrder ?
+    <Container isRight={!reversedFieldsOrder} depth={depth} windowWidth={windowWidth}>
+      {reversedFieldsOrder || windowWidth < MOBILE_WIDTH ?
         <>
           <span className='price'>{price}</span>
           <span>{size}</span>

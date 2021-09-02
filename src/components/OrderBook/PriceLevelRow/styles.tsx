@@ -3,6 +3,7 @@ import styled from "styled-components";
 interface ContainerProps {
   isRight: boolean;
   depth: number;
+  windowWidth: number;
 }
 
 export const Container = styled.div<ContainerProps>`
@@ -21,13 +22,19 @@ export const Container = styled.div<ContainerProps>`
     display: block;
     content: "";
     position: absolute;
-    left: ${props => props.isRight ? 'unset' : 0};
-    right: ${props => props.isRight ? 0 : 'unset'};
+    left: 0;
+    right: unset;
     z-index: 0;
+
+    @media only screen and (min-width: 800px) {
+      left: ${props => props.isRight ? 'unset' : 0};
+      right: ${props => props.isRight ? 0 : 'unset'};
+    }
   }
   
   span {
     z-index: 1;
+    min-width: 54px;
   }
   
   .price {

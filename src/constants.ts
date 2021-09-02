@@ -1,0 +1,1 @@
+export const MOBILE_WIDTH = 800; // px
