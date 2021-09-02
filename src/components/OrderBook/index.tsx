@@ -5,7 +5,7 @@ import { Container, TableContainer } from "./styles";
 import PriceLevelRow from "./PriceLevelRow";
 import Spread from "../Spread";
 import { useAppDispatch, useAppSelector } from '../../hooks';
-import { addExistingState, selectAsks, selectBids } from './orderbookSlice';
+import { addAsks, addBids, addExistingState, selectAsks, selectBids } from './orderbookSlice';
 import { MOBILE_WIDTH } from "../../constants";
 
 const WSS_FEED_URL: string = 'wss://www.cryptofacilities.com/ws/v1';
@@ -41,10 +41,10 @@ const OrderBook: FunctionComponent<OrderBookProps> = ({ windowWidth }) => {
         dispatch(addExistingState(response));
       } else {
         if (response?.bids?.length > 0) {
-          // dispatch(addBids(response.bids));
+          dispatch(addBids(response.bids));
         }
         if (response?.asks?.length > 0) {
-          // dispatch(addAsks(response.asks));
+          dispatch(addAsks(response.asks));
         }
       }
     };

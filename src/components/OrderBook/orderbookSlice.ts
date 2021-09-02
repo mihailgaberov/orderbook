@@ -110,7 +110,6 @@ export const orderbookSlice = createSlice({
   initialState,
   reducers: {
     addBids: (state, { payload }) => {
-      // state.bids = applyDeltas(current(state).bids,  addTotalSums(payload));
       const updatedBids: number[][] = applyDeltas(current(state).bids, addTotalSums(payload));
       state.maxTotalBids = getMaxTotalSum(updatedBids);
       state.bids = addDepths(updatedBids, current(state).maxTotalBids);
@@ -118,13 +117,7 @@ export const orderbookSlice = createSlice({
     addAsks: (state, { payload }) => {
       const updatedAsks: number[][] = applyDeltas(current(state).asks, addTotalSums(payload));
       state.maxTotalAsks = getMaxTotalSum(updatedAsks);
-      state.asks = addDepths(updatedAsks, getMaxTotalSum(updatedAsks));
-
-      /*const maxTotal: number = payload[payload.length - 1][2];
-      console.log(maxTotal)
-      const updatedAsks: number[][] = addDepths(payload, maxTotal);
-      state.maxTotalAsks = maxTotal;
-      state.asks = applyDeltas(current(state).asks, updatedAsks);*/
+      state.asks = addDepths(updatedAsks, current(state).maxTotalAsks);
     },
     addExistingState: (state, action: PayloadAction<any>) => {
       state.market = action.payload['product_id'];
