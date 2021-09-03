@@ -7,8 +7,7 @@ interface PriceLevelRowProps {
   total: string;
   size: string;
   price: string;
-  reversedFieldsOrder?: boolean;
-  depth: number;
+  reversedFieldsOrder: boolean;
   windowWidth: number;
 }
 
@@ -17,11 +16,10 @@ const PriceLevelRow: FunctionComponent<PriceLevelRowProps> = ({
                                                                 size,
                                                                 price,
                                                                 reversedFieldsOrder = false,
-                                                                depth,
                                                                 windowWidth
                                                               }) => {
   return (
-    <Container isRight={!reversedFieldsOrder} depth={depth} windowWidth={windowWidth}>
+    <Container isRight={!reversedFieldsOrder} windowWidth={windowWidth}>
       {reversedFieldsOrder || windowWidth < MOBILE_WIDTH ?
         <>
           <span className='price'>{price}</span>

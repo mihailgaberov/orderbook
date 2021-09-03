@@ -8,6 +8,7 @@ import { useAppDispatch, useAppSelector } from '../../hooks';
 import { addAsks, addBids, addExistingState, selectAsks, selectBids } from './orderbookSlice';
 import { MOBILE_WIDTH } from "../../constants";
 import Loader from "../Loader";
+import DepthVisualizer from "../DepthVisualizer";
 
 const WSS_FEED_URL: string = 'wss://www.cryptofacilities.com/ws/v1';
 const subscribeMessage = {
@@ -15,7 +16,10 @@ const subscribeMessage = {
   feed: 'book_ui_1',
   product_ids: ['PI_XBTUSD']
 };
-
+const DepthVisualizerColors = {
+  BIDS: "#3d1e28",
+  ASKS: "#113534"
+};
 enum OrderType {
   BIDS,
   ASKS
@@ -87,13 +91,17 @@ const OrderBook: FunctionComponent<OrderBookProps> = ({ windowWidth }) => {
         const size: string = formatNumber(level[1]);
         const price: string = formatPrice(level[0]);
 
-        return <PriceLevelRow key={idx}
-                              total={total}
-                              depth={depth}
-                              size={size}
-                              price={price}
-                              reversedFieldsOrder={orderType === OrderType.ASKS}
-                              windowWidth={windowWidth}/>;
+        return (<>
+          <DepthVisualizer depth={depth}
+                             color={orderType === OrderType.ASKS ? DepthVisualizerColors.ASKS : DepthVisualizerColors.BIDS}
+          />
+          <PriceLevelRow key={idx}
+                         total={total}
+                         size={size}
+                         price={price}
+                         reversedFieldsOrder={orderType === OrderType.ASKS}
+                         windowWidth={windowWidth}/>
+        </>);
       })
     );
   };

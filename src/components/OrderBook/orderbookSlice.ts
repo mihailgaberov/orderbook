@@ -86,7 +86,7 @@ const addTotalSums = (orders: number[][]): number[][] => {
       return order;
     } else {
       const updatedLevel = [...order];
-      const totalSum: number = idx === 0 ? size : size + totalSums[idx - 1]; // this is supposed to take all orders that are currently in the orderbook
+      const totalSum: number = idx === 0 ? size : size + totalSums[idx - 1];
       updatedLevel[2] = totalSum;
       totalSums.push(totalSum);
       return updatedLevel;
