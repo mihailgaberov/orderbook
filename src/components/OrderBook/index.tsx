@@ -16,11 +16,8 @@ const subscribeMessage = {
   feed: 'book_ui_1',
   product_ids: ['PI_XBTUSD']
 };
-const DepthVisualizerColors = {
-  BIDS: "#3d1e28",
-  ASKS: "#113534"
-};
-enum OrderType {
+
+export enum OrderType {
   BIDS,
   ASKS
 }
@@ -91,17 +88,14 @@ const OrderBook: FunctionComponent<OrderBookProps> = ({ windowWidth }) => {
         const size: string = formatNumber(level[1]);
         const price: string = formatPrice(level[0]);
 
-        return (<>
-          <DepthVisualizer depth={depth}
-                             color={orderType === OrderType.ASKS ? DepthVisualizerColors.ASKS : DepthVisualizerColors.BIDS}
-          />
-          <PriceLevelRow key={idx}
-                         total={total}
+        return (<div key={idx}>
+          <DepthVisualizer key={depth} windowWidth={windowWidth} depth={depth} orderType={orderType} />
+          <PriceLevelRow total={total}
                          size={size}
                          price={price}
                          reversedFieldsOrder={orderType === OrderType.ASKS}
                          windowWidth={windowWidth}/>
-        </>);
+        </div>);
       })
     );
   };

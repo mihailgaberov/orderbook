@@ -1,21 +1,29 @@
 import React, { FunctionComponent } from 'react';
+import { OrderType } from "../OrderBook";
+import { MOBILE_WIDTH } from "../../constants";
 
 interface DepthVisualizerProps {
   depth: number;
-  color: string;
+  orderType: OrderType;
+  windowWidth: number;
 }
 
-const DepthVisualizer: FunctionComponent<DepthVisualizerProps> = ({ depth, color }) => {
+const DepthVisualizerColors = {
+  BIDS: "#113534",
+  ASKS: "#3d1e28"
+};
+
+const DepthVisualizer: FunctionComponent<DepthVisualizerProps> = ({windowWidth, depth, orderType }) => {
   return <div style={{
-    backgroundColor: `${color}`,
+    backgroundColor: `${orderType === OrderType.BIDS ? DepthVisualizerColors.BIDS : DepthVisualizerColors.ASKS}`,
     height: "1.250em",
-    display: 'inline',
     width: `${depth}%`,
     position: "relative",
     top: 25,
-    left: 0,
-    zIndex: 1
-  }}></div>;
+    left: `${orderType === OrderType.BIDS && windowWidth > MOBILE_WIDTH ? `${100 - depth}%` : 0}`,
+    marginTop: -25,
+    zIndex: 1,
+  }} />;
 };
 
 export default DepthVisualizer;
