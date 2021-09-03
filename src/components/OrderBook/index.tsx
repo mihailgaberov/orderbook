@@ -82,7 +82,7 @@ const OrderBook: FunctionComponent<OrderBookProps> = ({ windowWidth }) => {
     );
 
     return (
-      sortedLevelsByPrice.map((level) => {
+      sortedLevelsByPrice.map((level, idx) => {
         const calculatedTotal: number = level[2];
         const total: string = formatNumber(calculatedTotal);
         const depth = level[3];
@@ -90,9 +90,10 @@ const OrderBook: FunctionComponent<OrderBookProps> = ({ windowWidth }) => {
         const price: string = formatPrice(level[0]);
 
         return (
-          <PriceLevelRowContainer>
+          <PriceLevelRowContainer key={idx+depth}>
             <DepthVisualizer key={depth} windowWidth={windowWidth} depth={depth} orderType={orderType}/>
-            <PriceLevelRow total={total}
+            <PriceLevelRow key={size+total}
+                           total={total}
                            size={size}
                            price={price}
                            reversedFieldsOrder={orderType === OrderType.ASKS}
