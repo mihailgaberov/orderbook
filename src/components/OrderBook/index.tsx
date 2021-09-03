@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect } from 'react';
+import React, { FunctionComponent, useEffect, useRef } from 'react';
 
 import TitleRow from "./TitleRow";
 import { Container, TableContainer } from "./styles";
@@ -22,55 +22,69 @@ export enum OrderType {
 interface OrderBookProps {
   windowWidth: number;
   productId: string;
+  isFeedKilled: boolean;
 }
 
-const OrderBook: FunctionComponent<OrderBookProps> = ({ windowWidth, productId }) => {
+const OrderBook: FunctionComponent<OrderBookProps> = ({ windowWidth, productId, isFeedKilled }) => {
   const bids: number[][] = useAppSelector(selectBids);
   const asks: number[][] = useAppSelector(selectAsks);
   const dispatch = useAppDispatch();
-
+  const ws = useRef({} as WebSocket);
 
   useEffect(() => {
-    const unSubscribeMessage = {
-      event: 'unsubscribe',
-      feed: 'book_ui_1',
-      product_ids: [ProductIds.XBTUSD === productId ? ProductIds.ETHUSD : ProductIds.XBTUSD]
-    };
-    const subscribeMessage = {
-      event: 'subscribe',
-      feed: 'book_ui_1',
-      product_ids: [productId]
-    };
-    const ws = new WebSocket(WSS_FEED_URL);
+    const connectWebSocket = () => {
+      const unSubscribeMessage = {
+        event: 'unsubscribe',
+        feed: 'book_ui_1',
+        product_ids: [ProductIds.XBTUSD === productId ? ProductIds.ETHUSD : ProductIds.XBTUSD]
+      };
+      const subscribeMessage = {
+        event: 'subscribe',
+        feed: 'book_ui_1',
+        product_ids: [productId]
+      };
 
-    ws.onopen = () => {
-      ws.send(JSON.stringify(unSubscribeMessage));
-      ws.send(JSON.stringify(subscribeMessage));
-    };
-    ws.onmessage = (event) => {
-      const response = JSON.parse(event.data);
-      if (response.numLevels) {
-        dispatch(addExistingState(response));
-      } else {
-        if (response?.bids?.length > 0) {
-          dispatch(addBids(response.bids));
-        }
-        if (response?.asks?.length > 0) {
-          dispatch(addAsks(response.asks));
-        }
-      }
-    };
-    ws.onerror = () => {
+      ws.current = new WebSocket(WSS_FEED_URL);
 
+      ws.current.onopen = () => {
+        ws.current.send(JSON.stringify(unSubscribeMessage));
+        ws.current.send(JSON.stringify(subscribeMessage));
+      };
+      ws.current.onmessage = (event) => {
+        const response = JSON.parse(event.data);
+        if (response.numLevels) {
+          dispatch(addExistingState(response));
+        } else {
+          if (response?.bids?.length > 0) {
+            dispatch(addBids(response.bids));
+          }
+          if (response?.asks?.length > 0) {
+            dispatch(addAsks(response.asks));
+          }
+        }
+      };
+      ws.current.onerror = (event: Event) => {
+        console.log('An error occurred:', event);
+        setTimeout(() => {
+          connectWebSocket();
+          console.log(">>> reconnecting in 2 sec")
+        }, 2000);
+      };
+      ws.current.onclose = () => {
+        ws.current.close();
+      };
     };
-    ws.onclose = () => {
-      ws.close();
-    };
+
+    if (isFeedKilled) {
+      ws.current.close();
+    } else {
+      connectWebSocket();
+    }
 
     return () => {
-      ws.close();
+      ws.current.close();
     };
-  }, [dispatch, productId]);
+  }, [dispatch, productId, isFeedKilled]);
 
   const formatNumber = (arg: number): string => {
     return new Intl.NumberFormat('en-US').format(arg);
@@ -102,9 +116,9 @@ const OrderBook: FunctionComponent<OrderBookProps> = ({ windowWidth, productId }
         const price: string = formatPrice(level[0]);
 
         return (
-          <PriceLevelRowContainer key={idx+depth}>
+          <PriceLevelRowContainer key={idx + depth}>
             <DepthVisualizer key={depth} windowWidth={windowWidth} depth={depth} orderType={orderType}/>
-            <PriceLevelRow key={size+total}
+            <PriceLevelRow key={size + total}
                            total={total}
                            size={size}
                            price={price}

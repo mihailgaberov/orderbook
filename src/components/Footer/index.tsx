@@ -5,13 +5,15 @@ import Button from "../Button";
 
 interface FooterProps {
   toggleFeedCallback: () => void;
+  killFeedCallback: () => void;
+  isFeedKilled: boolean;
 }
 
-const Footer: FunctionComponent<FooterProps> = ({ toggleFeedCallback }) => {
+const Footer: FunctionComponent<FooterProps> = ({ toggleFeedCallback, killFeedCallback , isFeedKilled}) => {
   return (
     <Container>
-      <Button title={'Toggle Feed'} backgroundColor={'#5741d9'} callback={toggleFeedCallback}/>
-      <Button title={'Kill Feed'} backgroundColor={'#b91d1d'} callback={() => console.log('Kill Feed clicked...')}/>
+      {!isFeedKilled && <Button title={'Toggle Feed'} backgroundColor={'#5741d9'} callback={toggleFeedCallback}/>}
+      <Button title={isFeedKilled ? 'Renew feed' : 'Kill Feed'} backgroundColor={'#b91d1d'} callback={killFeedCallback}/>
     </Container>
   );
 };
