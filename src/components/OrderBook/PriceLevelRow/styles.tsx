@@ -8,7 +8,6 @@ interface ContainerProps {
 export const Container = styled.div<ContainerProps>`
   display: flex;
   justify-content: space-around;
-  margin: .3em 0;
   background-color: #121723;
   position: relative;
   
@@ -38,4 +37,8 @@ export const Container = styled.div<ContainerProps>`
   .price {
     color: ${props => props.isRight ? '#118860' : '#bb3336'}
   }
+`
+
+export const PriceLevelRowContainer = styled.div`
+  margin: .155em 0;
 `

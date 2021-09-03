@@ -19,9 +19,9 @@ const DepthVisualizer: FunctionComponent<DepthVisualizerProps> = ({windowWidth, 
     height: "1.250em",
     width: `${depth}%`,
     position: "relative",
-    top: 25,
+    top: 21,
     left: `${orderType === OrderType.BIDS && windowWidth > MOBILE_WIDTH ? `${100 - depth}%` : 0}`,
-    marginTop: -25,
+    marginTop: -24,
     zIndex: 1,
   }} />;
 };
