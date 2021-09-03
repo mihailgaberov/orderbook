@@ -7,5 +7,9 @@ export const Container = styled.div`
     color: white;
     border: none;
     background-color: #303947;
+    
+    &:hover {
+      cursor: pointer;
+    }
   }
 `
