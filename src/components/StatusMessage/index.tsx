@@ -9,7 +9,7 @@ interface StatusMessageProps {
 const StatusMessage: FunctionComponent<StatusMessageProps> = ({currency = '', isFeedKilled}) => {
   return (
     <Container>
-      {isFeedKilled ? 'Feed killed.' : `Currency changed to: ${currency}`}
+      {isFeedKilled ? 'Feed killed.' : `Selected market: ${currency}`}
     </Container>
   );
 };

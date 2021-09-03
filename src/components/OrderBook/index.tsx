@@ -13,6 +13,7 @@ import { PriceLevelRowContainer } from "./PriceLevelRow/styles";
 import { ProductIds } from "../../App";
 
 const WSS_FEED_URL: string = 'wss://www.cryptofacilities.com/ws/v1';
+const RECONNECTING_TIME = 2000; // ms
 
 export enum OrderType {
   BIDS,
@@ -40,7 +41,6 @@ const OrderBook: FunctionComponent<OrderBookProps> = ({ windowWidth, productId, 
       };
 
       ws.current = new WebSocket(WSS_FEED_URL);
-
       ws.current.onopen = () => {
         ws.current.send(JSON.stringify(subscribeMessage));
       };
@@ -58,11 +58,11 @@ const OrderBook: FunctionComponent<OrderBookProps> = ({ windowWidth, productId, 
         }
       };
       ws.current.onerror = (event: Event) => {
-        console.log('An error occurred:', event);
+        console.log('An error occurred when subscribing to feed:', event);
         setTimeout(() => {
           connectWebSocket();
           console.log("Reconnecting socket in 2 seconds.");
-        }, 2000);
+        }, RECONNECTING_TIME);
       };
       ws.current.onclose = () => {
         ws.current.close();
@@ -83,6 +83,16 @@ const OrderBook: FunctionComponent<OrderBookProps> = ({ windowWidth, productId, 
       };
       ws.current.onopen = () => {
         ws.current.send(JSON.stringify(unSubscribeMessage));
+      };
+      ws.current.onerror = (event: Event) => {
+        console.log('An error occurred when unsubscribing from feed:', event);
+        setTimeout(() => {
+          connectWebSocket();
+          console.log("Reconnecting socket in 2 seconds.");
+        }, RECONNECTING_TIME);
+      };
+      ws.current.onclose = () => {
+        ws.current.close();
       };
     };
   }, [dispatch, isFeedKilled, productId]);
