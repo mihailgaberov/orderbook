@@ -9,7 +9,8 @@ const DepthVisualizer: FunctionComponent<DepthVisualizerProps> = ({ depth, color
   return <div style={{
     backgroundColor: `${color}`,
     height: "1.250em",
-    width: `${depth}px`,
+    display: 'inline',
+    width: `${depth}%`,
     position: "relative",
     top: 25,
     left: 0,
