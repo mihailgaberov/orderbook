@@ -3,8 +3,10 @@ import { RootState } from '../../store';
 
 export interface OrderbookState {
   market: string;
+  rawBids: number[][];
   bids: number[][];
   maxTotalBids: number;
+  rawAsks: number[][];
   asks: number[][];
   maxTotalAsks: number;
 }
@@ -13,8 +15,10 @@ const ORDERBOOK_LEVELS: number = 25;
 
 const initialState: OrderbookState = {
   market: 'PI_XBTUSD', // PI_ETHUSD
+  rawBids: [],
   bids: [],
   maxTotalBids: 0,
+  rawAsks: [],
   asks: [],
   maxTotalAsks: 0,
 };
@@ -114,26 +118,29 @@ export const orderbookSlice = createSlice({
   initialState,
   reducers: {
     addBids: (state, { payload }) => {
-      const updatedBids: number[][] = addTotalSums(applyDeltas(current(state).bids, payload));
+      const updatedBids: number[][] = addTotalSums(applyDeltas(current(state).rawBids, payload));
       state.maxTotalBids = getMaxTotalSum(updatedBids);
       state.bids = addDepths(updatedBids, current(state).maxTotalBids);
     },
     addAsks: (state, { payload }) => {
-      const updatedAsks: number[][] = addTotalSums(applyDeltas(current(state).asks, payload));
+      const updatedAsks: number[][] = addTotalSums(applyDeltas(current(state).rawAsks, payload));
       state.maxTotalAsks = getMaxTotalSum(updatedAsks);
       state.asks = addDepths(updatedAsks, current(state).maxTotalAsks);
     },
     addExistingState: (state, action: PayloadAction<any>) => {
+      const rawBids: number[][] = action.payload.bids;
+      const rawAsks: number[][] = action.payload.asks;
+      const bids: number[][] = addTotalSums(rawBids);
+      const asks: number[][] = addTotalSums(rawAsks);
+
       state.market = action.payload['product_id'];
-
-      const bids: number[][] = addTotalSums(action.payload.bids);
+      state.rawBids = rawBids;
+      state.rawAsks = rawAsks;
       state.maxTotalBids = getMaxTotalSum(bids);
-      state.bids = addDepths(bids, current(state).maxTotalBids);
-
-      const asks: number[][] = addTotalSums(action.payload.asks);
       state.maxTotalAsks = getMaxTotalSum(asks);
+      state.bids = addDepths(bids, current(state).maxTotalBids);
       state.asks = addDepths(asks, current(state).maxTotalAsks);
-    },
+    }
   }
 });
 

@@ -1,4 +1,5 @@
 import React, { FunctionComponent } from 'react';
+
 import { Container } from "./styles";
 import { MOBILE_WIDTH } from "../../../constants";
 
