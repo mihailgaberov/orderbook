@@ -2,14 +2,15 @@ import React, { FunctionComponent } from 'react';
 
 import { Container } from "./Container";
 
-const GroupingSelectBox: FunctionComponent = () => {
+interface GroupingSelectBoxProps {
+  options: number[]
+}
+
+const GroupingSelectBox: FunctionComponent<GroupingSelectBoxProps> = ({options}) => {
   return (
     <Container>
-      <select name="pets" id="pet-select">
-        <option value="0.5">Group 0.50</option>
-        <option value="1">Group 1.00</option>
-        <option value="cat">Group 2.50</option>
-
+      <select name="groupings" onChange={(e) => console.log('selected grouping: ', e.target.value)}>
+        {options.map((option, idx) => <option key={idx} value={option}>Group {option}</option>)}
       </select>
 
     </Container>

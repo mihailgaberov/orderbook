@@ -3,11 +3,15 @@ import React, { FunctionComponent } from 'react';
 import { Container } from "./styles";
 import Button from "../Button";
 
-const Footer: FunctionComponent = () => {
+interface FooterProps {
+  toggleFeedCallback: () => void;
+}
+
+const Footer: FunctionComponent<FooterProps> = ({ toggleFeedCallback }) => {
   return (
     <Container>
-      <Button title={'Toggle Feed'} backgroundColor={'#5741d9'} callback={() => console.log('Toggle Feed clicked...')} />
-      <Button title={'Kill Feed'} backgroundColor={'#b91d1d'} callback={() => console.log('Kill Feed clicked...')} />
+      <Button title={'Toggle Feed'} backgroundColor={'#5741d9'} callback={toggleFeedCallback}/>
+      <Button title={'Kill Feed'} backgroundColor={'#b91d1d'} callback={() => console.log('Kill Feed clicked...')}/>
     </Container>
   );
 };

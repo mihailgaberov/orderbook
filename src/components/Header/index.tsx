@@ -7,7 +7,7 @@ const Header: FunctionComponent = () => {
   return (
     <Container>
       <h3>Order Book</h3>
-      <GroupingSelectBox />
+      <GroupingSelectBox options={[0.5, 1, 2.5]} />
     </Container>
   );
 };
