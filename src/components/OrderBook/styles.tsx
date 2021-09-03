@@ -6,7 +6,7 @@ export const Container = styled.div`
   justify-content: center;
   align-items: center;
   border-color: #263946;
-  
+
   @media only screen and (min-width: 800px) {
     flex-direction: row;
     justify-content: center;
@@ -19,12 +19,11 @@ interface TableContainerProps {
 
 export const TableContainer = styled.div<TableContainerProps>`
   display: flex;
-  width: 50%;
-  // flex-direction: ${props => props.isBids ? 'column' : 'column-reverse'} ;
+  width: 100%;
   flex-direction: column;
   color: #bfc1c8;
 
   @media only screen and (min-width: 800px) {
-    flex-direction: column;
+    width: 50%;
   }
 `
