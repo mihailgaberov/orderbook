@@ -14,7 +14,7 @@ function App() {
   const [windowWidth, setWindowWidth] = useState(0);
   const [productId, setProductId] = useState(ProductIds.XBTUSD);
   const [isFeedKilled, setIsFeedKilled] = useState(false);
-  const [isPageVisible, setIsPageVisible] = useState(false);
+  const [isPageVisible, setIsPageVisible] = useState(true);
 
   // Window width detection
   useEffect(()=> {
