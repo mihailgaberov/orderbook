@@ -121,17 +121,29 @@ export const orderbookSlice = createSlice({
   reducers: {
     addBids: (state, { payload }) => {
       const currentTicketSize: number = current(state).groupingSize;
-      const updatedBids: number[][] = addTotalSums(applyDeltas(current(state).rawBids, payload));
+      const groupedCurrentBids: number[][] = groupByTicketSize(payload, currentTicketSize);
+      const updatedBids: number[][] = addTotalSums(
+        applyDeltas(
+          groupByTicketSize(current(state).rawBids, currentTicketSize),
+          groupedCurrentBids
+        )
+      );
 
       state.maxTotalBids = getMaxTotalSum(updatedBids);
-      state.bids = addDepths(groupByTicketSize(updatedBids, currentTicketSize), current(state).maxTotalBids);
+      state.bids = addDepths(updatedBids, current(state).maxTotalBids);
     },
     addAsks: (state, { payload }) => {
       const currentTicketSize: number = current(state).groupingSize;
-      const updatedAsks: number[][] = addTotalSums(applyDeltas(current(state).rawAsks, payload));
+      const groupedCurrentAsks: number[][] = groupByTicketSize(payload, currentTicketSize);
+      const updatedAsks: number[][] = addTotalSums(
+        applyDeltas(
+          groupByTicketSize(current(state).rawAsks, currentTicketSize),
+          groupedCurrentAsks
+        )
+      );
 
       state.maxTotalAsks = getMaxTotalSum(updatedAsks);
-      state.asks = addDepths(groupByTicketSize(updatedAsks, currentTicketSize), current(state).maxTotalAsks);
+      state.asks = addDepths(updatedAsks, current(state).maxTotalAsks);
     },
     addExistingState: (state, action: PayloadAction<any>) => {
       const rawBids: number[][] = action.payload.bids;
