@@ -1,5 +1,6 @@
 import { createSlice, current, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../../store';
+import { groupByTicketSize } from "../../helpers";
 
 export interface OrderbookState {
   market: string;
@@ -9,6 +10,7 @@ export interface OrderbookState {
   rawAsks: number[][];
   asks: number[][];
   maxTotalAsks: number;
+  groupingSize: number;
 }
 
 const ORDERBOOK_LEVELS: number = 25;
@@ -21,6 +23,7 @@ const initialState: OrderbookState = {
   rawAsks: [],
   asks: [],
   maxTotalAsks: 0,
+  groupingSize: 0.5
 };
 
 const removePriceLevel = (price: number, levels: number[][]): number[][] => levels.filter(level => level[0] !== price);
@@ -37,7 +40,7 @@ const updatePriceLevel = (updatedLevel: number[], levels: number[][]): number[][
 const levelExists = (deltaLevelPrice: number, currentLevels: number[][]): boolean => currentLevels.some(level => level[0] === deltaLevelPrice);
 
 const addPriceLevel = (deltaLevel: number[], levels: number[][]): number[][] => {
-  return [...levels, deltaLevel];
+  return [ ...levels, deltaLevel ];
 };
 
 /**
@@ -85,7 +88,7 @@ const addTotalSums = (orders: number[][]): number[][] => {
     if (typeof order[2] !== 'undefined') {
       return order;
     } else {
-      const updatedLevel = [...order];
+      const updatedLevel = [ ...order ];
       const totalSum: number = idx === 0 ? size : size + totalSums[idx - 1];
       updatedLevel[2] = totalSum;
       totalSums.push(totalSum);
@@ -101,7 +104,7 @@ const addDepths = (orders: number[][], maxTotal: number): number[][] => {
     } else {
       const calculatedTotal: number = order[2];
       const depth = (calculatedTotal / maxTotal) * 100;
-      const updatedOrder = [...order];
+      const updatedOrder = [ ...order ];
       updatedOrder[3] = depth;
       return updatedOrder;
     }
@@ -118,12 +121,22 @@ export const orderbookSlice = createSlice({
   initialState,
   reducers: {
     addBids: (state, { payload }) => {
-      const updatedBids: number[][] = addTotalSums(applyDeltas(current(state).rawBids, payload));
+      const updatedBids: number[][] = addTotalSums(
+        groupByTicketSize(
+          applyDeltas(current(state).rawBids, payload),
+          current(state).groupingSize
+        )
+      );
       state.maxTotalBids = getMaxTotalSum(updatedBids);
       state.bids = addDepths(updatedBids, current(state).maxTotalBids);
     },
     addAsks: (state, { payload }) => {
-      const updatedAsks: number[][] = addTotalSums(applyDeltas(current(state).rawAsks, payload));
+      const updatedAsks: number[][] = addTotalSums(
+        groupByTicketSize(
+          applyDeltas(current(state).rawAsks, payload),
+          current(state).groupingSize
+        )
+      );
       state.maxTotalAsks = getMaxTotalSum(updatedAsks);
       state.asks = addDepths(updatedAsks, current(state).maxTotalAsks);
     },
@@ -140,13 +153,24 @@ export const orderbookSlice = createSlice({
       state.maxTotalAsks = getMaxTotalSum(asks);
       state.bids = addDepths(bids, current(state).maxTotalBids);
       state.asks = addDepths(asks, current(state).maxTotalAsks);
+    },
+    setGrouping: (state, { payload }) => {
+      state.groupingSize = payload;
+      const bids: number[][] = addTotalSums(groupByTicketSize(current(state).bids, payload));
+      const asks: number[][] = addTotalSums(groupByTicketSize(current(state).asks, payload));
+
+      state.maxTotalBids = getMaxTotalSum(bids);
+      state.maxTotalAsks = getMaxTotalSum(asks);
+      state.bids = addDepths(bids, current(state).maxTotalBids);
+      state.asks = addDepths(asks, current(state).maxTotalAsks);
     }
   }
 });
 
-export const { addBids, addAsks, addExistingState } = orderbookSlice.actions;
+export const { addBids, addAsks, addExistingState, setGrouping } = orderbookSlice.actions;
 
 export const selectBids = (state: RootState): number[][] => state.orderbook.bids;
 export const selectAsks = (state: RootState): number[][] => state.orderbook.asks;
+export const selectGrouping = (state: RootState): number => state.orderbook.groupingSize;
 
 export default orderbookSlice.reducer;
