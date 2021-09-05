@@ -14,7 +14,7 @@ const DepthVisualizerColors = {
 };
 
 const DepthVisualizer: FunctionComponent<DepthVisualizerProps> = ({windowWidth, depth, orderType }) => {
-  return <div style={{
+  return <div data-testid="depth-visualizer" style={{
     backgroundColor: `${orderType === OrderType.BIDS ? DepthVisualizerColors.BIDS : DepthVisualizerColors.ASKS}`,
     height: "1.250em",
     width: `${depth}%`,
