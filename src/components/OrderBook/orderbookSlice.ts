@@ -172,5 +172,6 @@ export const { addBids, addAsks, addExistingState, setGrouping } = orderbookSlic
 export const selectBids = (state: RootState): number[][] => state.orderbook.bids;
 export const selectAsks = (state: RootState): number[][] => state.orderbook.asks;
 export const selectGrouping = (state: RootState): number => state.orderbook.groupingSize;
+export const selectMarket = (state: RootState): string => state.orderbook.market;
 
 export default orderbookSlice.reducer;
