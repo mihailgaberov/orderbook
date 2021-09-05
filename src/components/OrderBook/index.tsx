@@ -6,7 +6,7 @@ import PriceLevelRow from "./PriceLevelRow";
 import Spread from "../Spread";
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { addAsks, addBids, addExistingState, selectAsks, selectBids } from './orderbookSlice';
-import { MOBILE_WIDTH } from "../../constants";
+import { MOBILE_WIDTH, ORDERBOOK_LEVELS } from "../../constants";
 import Loader from "../Loader";
 import DepthVisualizer from "../DepthVisualizer";
 import { PriceLevelRowContainer } from "./PriceLevelRow/styles";
@@ -31,6 +31,8 @@ const OrderBook: FunctionComponent<OrderBookProps> = ({ windowWidth, productId, 
   const asks: number[][] = useAppSelector(selectAsks);
   const dispatch = useAppDispatch();
   const ws = useRef({} as WebSocket);
+  const currentBids = useRef([] as number[][]);
+  const currentAsks = useRef([] as number[][]);
 
   useEffect(() => {
     function connectWebSocket() {
@@ -50,10 +52,22 @@ const OrderBook: FunctionComponent<OrderBookProps> = ({ windowWidth, productId, 
           dispatch(addExistingState(response));
         } else {
           if (response?.bids?.length > 0) {
-            dispatch(addBids(response.bids));
+            currentBids.current.push(...response.bids);
+
+            if (currentBids.current.length > ORDERBOOK_LEVELS) {
+              dispatch(addBids(currentBids.current));
+              currentBids.current = [];
+              currentBids.current.length = 0;
+            }
           }
           if (response?.asks?.length > 0) {
-            dispatch(addAsks(response.asks));
+            currentAsks.current.push(...response.asks);
+
+            if (currentAsks.current.length > ORDERBOOK_LEVELS) {
+              dispatch(addAsks(currentAsks.current));
+              currentAsks.current = [];
+              currentAsks.current.length = 0;
+            }
           }
         }
       };
@@ -128,13 +142,13 @@ const OrderBook: FunctionComponent<OrderBookProps> = ({ windowWidth, productId, 
 
         return (
           <PriceLevelRowContainer key={idx + depth}>
-            <DepthVisualizer key={depth} windowWidth={windowWidth} depth={depth} orderType={orderType}/>
+            <DepthVisualizer key={depth} windowWidth={windowWidth} depth={depth} orderType={orderType} />
             <PriceLevelRow key={size + total}
                            total={total}
                            size={size}
                            price={price}
                            reversedFieldsOrder={orderType === OrderType.ASKS}
-                           windowWidth={windowWidth}/>
+                           windowWidth={windowWidth} />
           </PriceLevelRowContainer>
         );
       })
@@ -146,18 +160,18 @@ const OrderBook: FunctionComponent<OrderBookProps> = ({ windowWidth, productId, 
       {bids.length && asks.length ?
         <>
           <TableContainer isBids>
-            {windowWidth > MOBILE_WIDTH && <TitleRow windowWidth={windowWidth} reversedFieldsOrder={false}/>}
+            {windowWidth > MOBILE_WIDTH && <TitleRow windowWidth={windowWidth} reversedFieldsOrder={false} />}
             <div>{buildPriceLevels(bids, OrderType.BIDS)}</div>
           </TableContainer>
-          <Spread/>
+          <Spread />
           <TableContainer isBids={false}>
-            <TitleRow windowWidth={windowWidth} reversedFieldsOrder={true}/>
+            <TitleRow windowWidth={windowWidth} reversedFieldsOrder={true} />
             <div>
               {buildPriceLevels(asks, OrderType.ASKS)}
             </div>
           </TableContainer>
         </> :
-        <Loader/>}
+        <Loader />}
 
 
     </Container>

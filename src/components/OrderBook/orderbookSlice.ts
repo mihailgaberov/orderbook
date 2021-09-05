@@ -1,6 +1,7 @@
 import { createSlice, current, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../../store';
 import { groupByTicketSize } from "../../helpers";
+import { ORDERBOOK_LEVELS } from "../../constants";
 
 export interface OrderbookState {
   market: string;
@@ -12,8 +13,6 @@ export interface OrderbookState {
   maxTotalAsks: number;
   groupingSize: number;
 }
-
-const ORDERBOOK_LEVELS: number = 25;
 
 const initialState: OrderbookState = {
   market: 'PI_XBTUSD', // PI_ETHUSD
