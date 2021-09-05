@@ -17,7 +17,7 @@ function App() {
   const [isPageVisible, setIsPageVisible] = useState(true);
 
   // Window width detection
-  useEffect(()=> {
+  useEffect(() => {
     window.onresize = () => {
       setWindowWidth(window.innerWidth);
     }
@@ -80,8 +80,8 @@ function App() {
   return (
     <>
       {isPageVisible ? <>
-        <GlobalStyle/>
-        <Header/>
+        <GlobalStyle />
+        <Header />
         <OrderBook windowWidth={windowWidth} productId={productId} isFeedKilled={isFeedKilled} />
         <Footer toggleFeedCallback={toggleProductId} killFeedCallback={toggleFeed} isFeedKilled={isFeedKilled} />
         <StatusMessage isFeedKilled={isFeedKilled} currency={productId} />
