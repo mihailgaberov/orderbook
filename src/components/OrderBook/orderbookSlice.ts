@@ -143,8 +143,8 @@ export const orderbookSlice = createSlice({
     addExistingState: (state, action: PayloadAction<any>) => {
       const rawBids: number[][] = action.payload.bids;
       const rawAsks: number[][] = action.payload.asks;
-      const bids: number[][] = addTotalSums(rawBids);
-      const asks: number[][] = addTotalSums(rawAsks);
+      const bids: number[][] = addTotalSums(addTotalSums(groupByTicketSize(rawBids, current(state).groupingSize)));
+      const asks: number[][] = addTotalSums(addTotalSums(groupByTicketSize(rawAsks, current(state).groupingSize)));
 
       state.market = action.payload['product_id'];
       state.rawBids = rawBids;
@@ -156,13 +156,6 @@ export const orderbookSlice = createSlice({
     },
     setGrouping: (state, { payload }) => {
       state.groupingSize = payload;
-      const bids: number[][] = addTotalSums(groupByTicketSize(current(state).bids, payload));
-      const asks: number[][] = addTotalSums(groupByTicketSize(current(state).asks, payload));
-
-      state.maxTotalBids = getMaxTotalSum(bids);
-      state.maxTotalAsks = getMaxTotalSum(asks);
-      state.bids = addDepths(bids, current(state).maxTotalBids);
-      state.asks = addDepths(asks, current(state).maxTotalAsks);
     }
   }
 });
