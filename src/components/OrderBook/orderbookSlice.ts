@@ -143,8 +143,8 @@ export const orderbookSlice = createSlice({
     addExistingState: (state, action: PayloadAction<any>) => {
       const rawBids: number[][] = action.payload.bids;
       const rawAsks: number[][] = action.payload.asks;
-      const bids: number[][] = addTotalSums(addTotalSums(groupByTicketSize(rawBids, current(state).groupingSize)));
-      const asks: number[][] = addTotalSums(addTotalSums(groupByTicketSize(rawAsks, current(state).groupingSize)));
+      const bids: number[][] = addTotalSums(groupByTicketSize(rawBids, current(state).groupingSize));
+      const asks: number[][] = addTotalSums(groupByTicketSize(rawAsks, current(state).groupingSize));
 
       state.market = action.payload['product_id'];
       state.rawBids = rawBids;
