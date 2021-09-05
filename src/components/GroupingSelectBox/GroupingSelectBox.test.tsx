@@ -1,16 +1,16 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { GroupingSelectBox } from './index';
+import { Provider } from 'react-redux';
+import configureStore from 'redux-mock-store';
 
-import { Provider } from 'react-redux'
-import configureStore from 'redux-mock-store'
+import { GroupingSelectBox } from './index';
 
 const initialState = {
   orderbook: {
     groupingSize: 1
   }
-}
-const mockStore = configureStore()
+};
+const mockStore = configureStore();
 
 test('renders a select box with certain grouping options', () => {
   const store = mockStore(initialState)

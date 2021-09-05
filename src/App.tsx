@@ -10,6 +10,11 @@ export const ProductIds = {
   ETHUSD: 'PI_ETHUSD'
 };
 
+const options: any = {
+  PI_XBTUSD: [0.5, 1, 2.5],
+  PI_ETHUSD: [0.05, 0.1, 0.25]
+};
+
 function App() {
   const [windowWidth, setWindowWidth] = useState(0);
   const [productId, setProductId] = useState(ProductIds.XBTUSD);
@@ -81,7 +86,7 @@ function App() {
     <>
       {isPageVisible ? <>
         <GlobalStyle />
-        <Header />
+        <Header options={options[productId]} />
         <OrderBook windowWidth={windowWidth} productId={productId} isFeedKilled={isFeedKilled} />
         <Footer toggleFeedCallback={toggleProductId} killFeedCallback={toggleFeed} isFeedKilled={isFeedKilled} />
         <StatusMessage isFeedKilled={isFeedKilled} currency={productId} />
