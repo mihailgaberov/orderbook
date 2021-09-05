@@ -8,7 +8,7 @@ interface GroupingSelectBoxProps {
   options: number[]
 }
 
-const GroupingSelectBox: FunctionComponent<GroupingSelectBoxProps> = ({options}) => {
+export const GroupingSelectBox: FunctionComponent<GroupingSelectBoxProps> = ({options}) => {
   const groupingSize: number = useAppSelector(selectGrouping);
   const dispatch = useAppDispatch();
 
@@ -18,7 +18,7 @@ const GroupingSelectBox: FunctionComponent<GroupingSelectBoxProps> = ({options})
 
   return (
     <Container>
-      <select name="groupings" onChange={handleChange} defaultValue={groupingSize}>
+      <select data-testid="groupings" name="groupings" onChange={handleChange} defaultValue={groupingSize}>
         {options.map((option, idx) => <option key={idx} value={option}>Group {option}</option>)}
       </select>
 
