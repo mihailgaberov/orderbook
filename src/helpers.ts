@@ -48,3 +48,7 @@ export const groupByPrice = (levels: number[][]): number[][] => {
 export const groupByTicketSize = (levels: number[][], ticketSize: number): number[][] => {
   return groupByPrice(levels.map(level => [roundToNearest(level[0], ticketSize), level[1]]));
 };
+
+export const formatNumber = (arg: number): string => {
+  return new Intl.NumberFormat('en-US').format(arg);
+};

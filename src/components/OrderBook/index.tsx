@@ -12,6 +12,7 @@ import Loader from "../Loader";
 import DepthVisualizer from "../DepthVisualizer";
 import { PriceLevelRowContainer } from "./PriceLevelRow/styles";
 import { ProductsMap } from "../../App";
+import { formatNumber } from "../../helpers";
 
 const WSS_FEED_URL: string = 'wss://www.cryptofacilities.com/ws/v1';
 
@@ -99,10 +100,10 @@ const OrderBook: FunctionComponent<OrderBookProps> = ({ windowWidth, productId, 
       }
     }
   };
-
+/*
   const formatNumber = (arg: number): string => {
     return new Intl.NumberFormat('en-US').format(arg);
-  };
+  };*/
 
   const formatPrice = (arg: number): string => {
     return arg.toLocaleString("en", { useGrouping: true, minimumFractionDigits: 2 })
@@ -152,7 +153,7 @@ const OrderBook: FunctionComponent<OrderBookProps> = ({ windowWidth, productId, 
             {windowWidth > MOBILE_WIDTH && <TitleRow windowWidth={windowWidth} reversedFieldsOrder={false} />}
             <div>{buildPriceLevels(bids, OrderType.BIDS)}</div>
           </TableContainer>
-          <Spread />
+          <Spread bids={bids} asks={asks} />
           <TableContainer isBids={false}>
             <TitleRow windowWidth={windowWidth} reversedFieldsOrder={true} />
             <div>
