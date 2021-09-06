@@ -80,12 +80,6 @@ function App() {
 
   const toggleProductId = (): void => {
     dispatch(clearOrdersState());
-
-    /*if (productId === ProductIds.XBTUSD) {
-      setProductId(ProductIds.ETHUSD)
-    } else {
-      setProductId(ProductIds.XBTUSD)
-    }*/
     setProductId(ProductsMap[productId]);
   };
 
