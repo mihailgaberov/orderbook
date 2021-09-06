@@ -1,4 +1,5 @@
-import React, { FunctionComponent, useEffect, useRef } from 'react';
+import React, { FunctionComponent, useEffect } from 'react';
+import useWebSocket from "react-use-websocket";
 
 import TitleRow from "./TitleRow";
 import { Container, TableContainer } from "./styles";
@@ -10,10 +11,9 @@ import { MOBILE_WIDTH, ORDERBOOK_LEVELS } from "../../constants";
 import Loader from "../Loader";
 import DepthVisualizer from "../DepthVisualizer";
 import { PriceLevelRowContainer } from "./PriceLevelRow/styles";
-import { ProductIds } from "../../App";
+import { ProductsMap } from "../../App";
 
 const WSS_FEED_URL: string = 'wss://www.cryptofacilities.com/ws/v1';
-const RECONNECTING_TIME = 2000; // ms
 
 export enum OrderType {
   BIDS,
@@ -26,90 +26,79 @@ interface OrderBookProps {
   isFeedKilled: boolean;
 }
 
+interface Delta {
+  bids: number[][];
+  asks: number[][];
+}
+
+let currentBids: number[][] = []
+let currentAsks: number[][] = []
+
 const OrderBook: FunctionComponent<OrderBookProps> = ({ windowWidth, productId, isFeedKilled }) => {
   const bids: number[][] = useAppSelector(selectBids);
   const asks: number[][] = useAppSelector(selectAsks);
   const dispatch = useAppDispatch();
-  const ws = useRef({} as WebSocket);
-  const currentBids = useRef([] as number[][]);
-  const currentAsks = useRef([] as number[][]);
+  const { sendJsonMessage, getWebSocket } = useWebSocket(WSS_FEED_URL, {
+    onOpen: () => console.log('WebSocket connection opened.'),
+    onClose: () => console.log('WebSocket connection closed.'),
+    shouldReconnect: (closeEvent) => true,
+    onMessage: (event: WebSocketEventMap['message']) =>  processMessages(event)
+  });
+
+  const processMessages = (event: { data: string; }) => {
+    const response = JSON.parse(event.data);
+
+    if (response.numLevels) {
+      dispatch(addExistingState(response));
+    } else {
+      process(response);
+    }
+  };
 
   useEffect(() => {
-    function connectWebSocket() {
-      const subscribeMessage = {
-        event: 'subscribe',
-        feed: 'book_ui_1',
-        product_ids: [productId]
-      };
-
-      ws.current = new WebSocket(WSS_FEED_URL);
-      ws.current.onopen = () => {
-        ws.current.send(JSON.stringify(subscribeMessage));
-      };
-      ws.current.onmessage = (event) => {
-        const response = JSON.parse(event.data);
-        if (response.numLevels) {
-          dispatch(addExistingState(response));
-        } else {
-          if (response?.bids?.length > 0) {
-            currentBids.current.push(...response.bids);
-
-            if (currentBids.current.length > ORDERBOOK_LEVELS) {
-              dispatch(addBids(currentBids.current));
-              currentBids.current = [];
-              currentBids.current.length = 0;
-            }
-          }
-          if (response?.asks?.length > 0) {
-            currentAsks.current.push(...response.asks);
-
-            if (currentAsks.current.length > ORDERBOOK_LEVELS) {
-              dispatch(addAsks(currentAsks.current));
-              currentAsks.current = [];
-              currentAsks.current.length = 0;
-            }
-          }
-        }
-      };
-      ws.current.onerror = (event: Event) => {
-        console.log('An error occurred when subscribing to feed:', event);
-        setTimeout(() => {
-          connectWebSocket();
-          console.log("Reconnecting socket in 2 seconds.");
-        }, RECONNECTING_TIME);
-      };
-      ws.current.onclose = () => {
-        ws.current.close();
-      };
-    }
-
-    if (isFeedKilled) {
-      ws.current.close();
-    } else {
-      connectWebSocket();
-    }
-
-    return () => {
+    function connect(product: string) {
       const unSubscribeMessage = {
         event: 'unsubscribe',
         feed: 'book_ui_1',
-        product_ids: [ProductIds.XBTUSD === productId ? ProductIds.ETHUSD : ProductIds.XBTUSD]
+        product_ids: [ProductsMap[product]]
       };
-      ws.current.onopen = () => {
-        ws.current.send(JSON.stringify(unSubscribeMessage));
+      sendJsonMessage(unSubscribeMessage);
+
+      const subscribeMessage = {
+        event: 'subscribe',
+        feed: 'book_ui_1',
+        product_ids: [product]
       };
-      ws.current.onerror = (event: Event) => {
-        console.log('An error occurred when unsubscribing from feed:', event);
-        setTimeout(() => {
-          connectWebSocket();
-          console.log("Reconnecting socket in 2 seconds.");
-        }, RECONNECTING_TIME);
-      };
-      ws.current.onclose = () => {
-        ws.current.close();
-      };
-    };
-  }, [dispatch, isFeedKilled, productId]);
+      sendJsonMessage(subscribeMessage);
+    }
+
+    if (isFeedKilled) {
+      getWebSocket()?.close();
+    } else {
+      connect(productId);
+    }
+  }, [isFeedKilled, productId ]);
+
+  const process = (data: Delta) => {
+    if (data?.bids?.length > 0) {
+      currentBids = [...currentBids, ...data.bids];
+
+      if (currentBids.length > ORDERBOOK_LEVELS) {
+        dispatch(addBids(currentBids));
+        currentBids = [];
+        currentBids.length = 0;
+      }
+    }
+    if (data?.asks?.length >= 0) {
+      currentAsks = [...currentAsks, ...data.asks];
+
+      if (currentAsks.length > ORDERBOOK_LEVELS) {
+        dispatch(addAsks(currentAsks));
+        currentAsks = [];
+        currentAsks.length = 0;
+      }
+    }
+  };
 
   const formatNumber = (arg: number): string => {
     return new Intl.NumberFormat('en-US').format(arg);
@@ -120,7 +109,7 @@ const OrderBook: FunctionComponent<OrderBookProps> = ({ windowWidth, productId, 
   };
 
   const buildPriceLevels = (levels: number[][], orderType: OrderType = OrderType.BIDS): React.ReactNode => {
-    const sortedLevelsByPrice: number[][] = [...levels].sort(
+    const sortedLevelsByPrice: number[][] = [ ...levels ].sort(
       (currentLevel: number[], nextLevel: number[]): number => {
         let result: number = 0;
         if (orderType === OrderType.BIDS || windowWidth < MOBILE_WIDTH) {

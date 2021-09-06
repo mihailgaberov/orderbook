@@ -4,6 +4,8 @@ import Header from "./components/Header";
 import OrderBook from "./components/OrderBook";
 import Footer from "./components/Footer";
 import StatusMessage from "./components/StatusMessage";
+import { clearOrdersState } from "./components/OrderBook/orderbookSlice";
+import { useAppDispatch } from "./hooks";
 
 export const ProductIds = {
   XBTUSD: 'PI_XBTUSD',
@@ -15,11 +17,17 @@ const options: any = {
   PI_ETHUSD: [0.05, 0.1, 0.25]
 };
 
+export const ProductsMap: any = {
+  "PI_XBTUSD": "PI_ETHUSD",
+  "PI_ETHUSD": "PI_XBTUSD",
+}
+
 function App() {
   const [windowWidth, setWindowWidth] = useState(0);
   const [productId, setProductId] = useState(ProductIds.XBTUSD);
   const [isFeedKilled, setIsFeedKilled] = useState(false);
   const [isPageVisible, setIsPageVisible] = useState(true);
+  const dispatch = useAppDispatch();
 
   // Window width detection
   useEffect(() => {
@@ -71,11 +79,14 @@ function App() {
   }, []);
 
   const toggleProductId = (): void => {
-    if (productId === ProductIds.XBTUSD) {
+    dispatch(clearOrdersState());
+
+    /*if (productId === ProductIds.XBTUSD) {
       setProductId(ProductIds.ETHUSD)
     } else {
       setProductId(ProductIds.XBTUSD)
-    }
+    }*/
+    setProductId(ProductsMap[productId]);
   };
 
   const toggleFeed = (): void => {
