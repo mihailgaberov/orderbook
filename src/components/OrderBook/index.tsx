@@ -78,7 +78,7 @@ const OrderBook: FunctionComponent<OrderBookProps> = ({ windowWidth, productId, 
     } else {
       connect(productId);
     }
-  }, [isFeedKilled, productId ]);
+  }, [isFeedKilled, productId, sendJsonMessage, getWebSocket]);
 
   const process = (data: Delta) => {
     if (data?.bids?.length > 0) {
@@ -100,10 +100,6 @@ const OrderBook: FunctionComponent<OrderBookProps> = ({ windowWidth, productId, 
       }
     }
   };
-/*
-  const formatNumber = (arg: number): string => {
-    return new Intl.NumberFormat('en-US').format(arg);
-  };*/
 
   const formatPrice = (arg: number): string => {
     return arg.toLocaleString("en", { useGrouping: true, minimumFractionDigits: 2 })
