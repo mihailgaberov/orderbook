@@ -94,7 +94,7 @@ function App() {
         <Header options={options[productId]} />
         <OrderBook windowWidth={windowWidth} productId={productId} isFeedKilled={isFeedKilled} />
         <Footer toggleFeedCallback={toggleProductId} killFeedCallback={toggleFeed} isFeedKilled={isFeedKilled} />
-        <StatusMessage isFeedKilled={isFeedKilled} currency={productId} />
+        <StatusMessage isFeedKilled={isFeedKilled} selectedMarket={productId} />
       </> : 'HIDDEN PAGE.'}
     </>
   );
