@@ -19,7 +19,7 @@ const PriceLevelRow: FunctionComponent<PriceLevelRowProps> = ({
                                                                 windowWidth
                                                               }) => {
   return (
-    <Container isRight={!reversedFieldsOrder} windowWidth={windowWidth}>
+    <Container data-testid='price-level-row' isRight={!reversedFieldsOrder} windowWidth={windowWidth}>
       {reversedFieldsOrder || windowWidth < MOBILE_WIDTH ?
         <>
           <span className='price'>{price}</span>
