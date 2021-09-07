@@ -17,12 +17,12 @@ An Orderbook app built with React/Typescript and powered by WebSockets.
  - react-testing-library
  
 ### Screenshots
-![Default View](https://github.com/mihailgaberov/mihail-25082021/blob/master/screenshots/default_view.png)
+![Default View](https://github.com/mihailgaberov/mihail-25082021/blob/main/screenshots/default_view.png)
 
-![iPhone 6/7/8](https://github.com/mihailgaberov/mihail-25082021/blob/master/screenshots/iphone678.png)
+![iPhone 6/7/8](https://github.com/mihailgaberov/mihail-25082021/blob/main/screenshots/iphone678.png)
 
-![Responsive](https://github.com/mihailgaberov/mihail-25082021/blob/master/screenshots/responsive.png)
+![Responsive](https://github.com/mihailgaberov/mihail-25082021/blob/main/screenshots/responsive.png)
 
-![XBTUSD Grouping: 1](https://github.com/mihailgaberov/mihail-25082021/blob/master/screenshots/XBTUSD_grouping_1.png)
+![XBTUSD Grouping: 1](https://github.com/mihailgaberov/mihail-25082021/blob/main/screenshots/XBTUSD_grouping_1.png)
 
-![ETHUSD Market](https://github.com/mihailgaberov/mihail-25082021/blob/master/screenshots/ETHUSD_market.png)
+![ETHUSD Market](https://github.com/mihailgaberov/mihail-25082021/blob/main/screenshots/ETHUSD_market.png)
