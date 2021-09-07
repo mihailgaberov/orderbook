@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 
 import PriceLevelRow from './index';
 
-test('renders price level component properly - not reversed', () => {
+test('renders price level row properly - not reversed', () => {
   render(<PriceLevelRow
     price={'1000'}
     reversedFieldsOrder={false}
@@ -15,7 +15,7 @@ test('renders price level component properly - not reversed', () => {
 });
 
 
-test('renders price level component properly - reversed', () => {
+test('renders price level row properly - reversed', () => {
   render(<PriceLevelRow
     price={'1000'}
     reversedFieldsOrder={true}

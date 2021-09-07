@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 
 import TitleRow from './index';
 
-test('renders title row component properly - not reversed', () => {
+test('renders title row properly - not reversed', () => {
   render(<TitleRow
     reversedFieldsOrder={false}
     windowWidth={800}/>);
@@ -13,7 +13,7 @@ test('renders title row component properly - not reversed', () => {
 });
 
 
-test('renders title row component properly - reversed', () => {
+test('renders title row properly - reversed', () => {
   render(<TitleRow
     reversedFieldsOrder={true}
     windowWidth={800} />);
