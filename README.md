@@ -1,4 +1,4 @@
-# mihail-25082021
+# Orderbook
 An Orderbook app built with React/Typescript and powered by WebSockets.
 
 <hr />
