@@ -58,7 +58,7 @@ An Orderbook app built with React/Typescript and powered by WebSockets.
 
 
 ### Demo
-:star: [https://mihail-25082021.vercel.app](https://mihail-25082021.vercel.app/) :star:
+:star: [orderbook-mihailgaberov.vercel.app](https://orderbook-mihailgaberov.vercel.app/) :star:
 
 ### Running the app locally
 
