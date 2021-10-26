@@ -4,6 +4,7 @@ An Orderbook app built with React/Typescript and powered by WebSockets.
 <hr />
 
 <!-- prettier-ignore-start -->
+[![Tests](https://github.com/mihailgaberov/orderbook/actions/workflows/main.yml/badge.svg)](https://github.com/mihailgaberov/orderbook/actions/workflows/main.yml)
 [![Build Status][build-badge]][build]
 
 [build-badge]: https://img.shields.io/github/deployments/mihailgaberov/mihail-25082021/production?label=vercel&logoColor=vercel
