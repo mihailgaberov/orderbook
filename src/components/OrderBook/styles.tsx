@@ -14,11 +14,7 @@ export const Container = styled.div`
   }
 `
 
-interface TableContainerProps {
-  isBids: boolean;
-}
-
-export const TableContainer = styled.div<TableContainerProps>`
+export const TableContainer = styled.div`
   display: flex;
   width: 100%;
   flex-direction: column;
