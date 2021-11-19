@@ -150,7 +150,7 @@ const OrderBook: FunctionComponent<OrderBookProps> = ({ windowWidth, productId, 
             <div>{buildPriceLevels(bids, OrderType.BIDS)}</div>
           </TableContainer>
           <Spread bids={bids} asks={asks} />
-          <TableContainer isBids={false}>
+          <TableContainer>
             <TitleRow windowWidth={windowWidth} reversedFieldsOrder={true} />
             <div>
               {buildPriceLevels(asks, OrderType.ASKS)}
