@@ -145,7 +145,7 @@ const OrderBook: FunctionComponent<OrderBookProps> = ({ windowWidth, productId, 
     <Container>
       {bids.length && asks.length ?
         <>
-          <TableContainer isBids>
+          <TableContainer>
             {windowWidth > MOBILE_WIDTH && <TitleRow windowWidth={windowWidth} reversedFieldsOrder={false} />}
             <div>{buildPriceLevels(bids, OrderType.BIDS)}</div>
           </TableContainer>
