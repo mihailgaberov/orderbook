@@ -158,8 +158,6 @@ const OrderBook: FunctionComponent<OrderBookProps> = ({ windowWidth, productId, 
           </TableContainer>
         </> :
         <Loader />}
-
-
     </Container>
   )
 };
