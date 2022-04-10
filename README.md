@@ -1,5 +1,5 @@
-# Orderbook
-An Orderbook app built with React/Typescript and powered by WebSockets.
+# Order Book
+An Order Book app built with React/Typescript and powered by WebSockets.
 
 <hr />
 
@@ -7,8 +7,8 @@ An Orderbook app built with React/Typescript and powered by WebSockets.
 [![Tests](https://github.com/mihailgaberov/orderbook/actions/workflows/main.yml/badge.svg)](https://github.com/mihailgaberov/orderbook/actions/workflows/main.yml)
 [![Build Status][build-badge]][build]
 
-[build-badge]: https://img.shields.io/github/deployments/mihailgaberov/mihail-25082021/production?label=vercel&logoColor=vercel
-[build]: https://github.com/mihailgaberov/mihail-25082021/deployments
+[build-badge]: https://img.shields.io/github/deployments/mihailgaberov/orderbook/production?label=vercel&logoColor=vercel
+[build]: https://github.com/mihailgaberov/orderbook/deployments
 <!-- prettier-ignore-end -->
 
 ## Tech stack
@@ -29,8 +29,8 @@ An Orderbook app built with React/Typescript and powered by WebSockets.
 ![ETHUSD Market](https://github.com/mihailgaberov/mihail-25082021/blob/main/screenshots/ETHUSD_market.png)
 
 ## Application features:
-### I. Orderbook
- 1. The orderbook consists of two sides: the buy side and the sell side.
+### I. Order Book
+ 1. The Order Book consists of two sides: the buy side and the sell side.
  2. Both sides contain information about the amount of orders opened at each price level.
  3. Each level displays the:
     1. Price - this is what defines the level. As orders must be placed at a price that is a
