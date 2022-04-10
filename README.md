@@ -18,15 +18,15 @@ An Order Book app built with React/Typescript and powered by WebSockets.
  - react-testing-library
  
 ### Screenshots
-![Default View](https://github.com/mihailgaberov/mihail-25082021/blob/main/screenshots/default_view.png)
+![Default View](https://github.com/mihailgaberov/orderbook/blob/main/screenshots/default_view.png)
 
-![iPhone 6/7/8](https://github.com/mihailgaberov/mihail-25082021/blob/main/screenshots/iphone678.png)
+![iPhone 6/7/8](https://github.com/mihailgaberov/orderbook/blob/main/screenshots/iphone678.png)
 
-![Responsive](https://github.com/mihailgaberov/mihail-25082021/blob/main/screenshots/responsive.png)
+![Responsive](https://github.com/mihailgaberov/orderbook/blob/main/screenshots/responsive.png)
 
-![XBTUSD Grouping: 1](https://github.com/mihailgaberov/mihail-25082021/blob/main/screenshots/XBTUSD_grouping_1.png)
+![XBTUSD Grouping: 1](https://github.com/mihailgaberov/orderbook/blob/main/screenshots/XBTUSD_grouping_1.png)
 
-![ETHUSD Market](https://github.com/mihailgaberov/mihail-25082021/blob/main/screenshots/ETHUSD_market.png)
+![ETHUSD Market](https://github.com/mihailgaberov/orderbook/blob/main/screenshots/ETHUSD_market.png)
 
 ## Application features:
 ### I. Order Book
