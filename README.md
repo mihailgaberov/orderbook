@@ -87,3 +87,8 @@ To run the tests:
 ```shell
   yarn test
 ```
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=mihailgaberov/orderbook&type=Date)](https://star-history.com/#mihailgaberov/orderbook&Date)
+
